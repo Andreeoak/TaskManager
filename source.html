@@ -14,7 +14,7 @@
   <div id="app">
     <form>
       <!-- Adding tasks form -->
-      <input placeholder="Add new task">
+      <input ref="newTaskInput" placeholder="Add new task">
       <select>
         <option disabled value="">Select priority</option>
         <option>High</option>
@@ -28,18 +28,18 @@
     <input placeholder="Filter tasks...">
 
     <!-- If there no tasks -->
-    <div>
+    <div v-if="tasks.length === 0" class="no-tasks">
       <p>No tasks found. Try changing the filter or add some tasks!</p>
     </div>
 
-    <div>
+    <div V-else>
       <h3>Your Tasks</h3>
-      <!-- This is a list of tasks -->
-      <div>
+      <div v-for="task in tasks" :key="task.id" 
+      :class="{'task': true,'completed': task.done, [task.priority.toLowerCase()]: true}">
         <div>
           <!-- Is task done? -->
-          <input type="checkbox">
-          <!-- Task description -->
+          <input type="checkbox" v-model="task.done">
+          <span class="task-description">{{ task.description }}</span>
           <span></span>
         </div>
         <!-- Removing a task -->
@@ -49,16 +49,32 @@
   </div>
 
   <script>
-    const {createApp, onMounted} = Vue;
+    const {createApp,ref, onMounted, onBeforeMount} = Vue;
 
     const App = {
       setup() {
+        const tasks = ref([
+            {
+                id:1,
+                description: "Buy groceries",
+                priority: "High",
+                done: false
+            }
+             
+        ])
+
+
+        const newTaskInput = Vue.ref(null); //has to be null
         onMounted(() => {
-          // This is where you can fetch tasks from an API or local storage
-          console.log('App mounted');
+          newTaskInput.value.focus(); // Focus the input when the component mounts
+        });
+        onBeforeMount(() => {
+          // This is where you can set up initial data or state
+          console.log('App about to mount');
         });
         return {
-
+            newTaskInput,
+            tasks
         }
       },
     };
