@@ -12,10 +12,10 @@
 
 <body>
   <div id="app">
-    <form>
+    <form @submit.prevent="addTask">
       <!-- Adding tasks form -->
-      <input ref="newTaskInput" placeholder="Add new task">
-      <select>
+      <input ref="newTaskInput" placeholder="Add new task" v-model="newTask" required>
+      <select v-model="newPriority">
         <option disabled value="">Select priority</option>
         <option>High</option>
         <option>Medium</option>
@@ -49,32 +49,48 @@
   </div>
 
   <script>
-    const {createApp,ref, onMounted, onBeforeMount} = Vue;
+    const {createApp,ref, onMounted, watch} = Vue;
 
     const App = {
       setup() {
-        const tasks = ref([
-            {
-                id:1,
-                description: "Buy groceries",
-                priority: "High",
-                done: false
-            }
-             
-        ])
-
+        const tasks = ref(
+          JSON.parse(localStorage.getItem('tasks') ??
+          [''])
+        );
 
         const newTaskInput = Vue.ref(null); //has to be null
+        const newTask = ref('');
+        const newPriority = ref('');
+
+        watch(tasks, () => {
+          localStorage.setItem('tasks', JSON.stringify(tasks.value));
+        }, { deep: true });
+        
         onMounted(() => {
           newTaskInput.value.focus(); // Focus the input when the component mounts
         });
-        onBeforeMount(() => {
-          // This is where you can set up initial data or state
-          console.log('App about to mount');
-        });
+
+        const addTask = () => {
+          if (newTask.value.trim() === '' || newPriority.value === '') {
+            return; // Prevent adding empty tasks or without priority
+          }
+          tasks.value.unshift({  //add to the beginning of the array (makes more sense)
+            id: tasks.value.length + 1,
+            description: newTask.value,
+            priority: newPriority.value,
+            done: false
+          });
+          newTask.value = ''; // Clear the input after adding
+          newPriority.value = ''; // Clear the priority selection
+          newTaskInput.value.focus(); // Refocus the input after adding a task
+        };
+
         return {
             newTaskInput,
-            tasks
+            tasks,
+            addTask,
+            newPriority,
+            newTask
         }
       },
     };
