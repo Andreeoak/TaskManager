@@ -25,7 +25,7 @@
     </form>
 
     <!-- Task filtering -->
-    <input placeholder="Filter tasks...">
+    <input placeholder="Filter tasks..." v-model="newfilter">
 
     <!-- If there no tasks -->
     <div v-if="tasks.length === 0" class="no-tasks">
@@ -53,18 +53,27 @@
 
     const App = {
       setup() {
-        const tasks = ref(
-          JSON.parse(localStorage.getItem('tasks') ??
-          [''])
-        );
+        const allTasks = ref(JSON.parse(localStorage.getItem('tasks') ?? '[]'));
+        const tasks = ref([...allTasks.value]); // cópia inicial
 
         const newTaskInput = Vue.ref(null); //has to be null
         const newTask = ref('');
         const newPriority = ref('');
+        const newfilter = ref('');
 
         watch(tasks, () => {
           localStorage.setItem('tasks', JSON.stringify(tasks.value));
         }, { deep: true });
+
+        watch(newfilter,()=>{
+          if (newfilter.value.trim() === '') {
+            tasks.value = [...allTasks.value];
+          } else {
+            tasks.value = allTasks.value.filter(task =>
+            task.description.toLowerCase().includes(newfilter.value.toLowerCase())
+            );
+          }
+        })
         
         onMounted(() => {
           newTaskInput.value.focus(); // Focus the input when the component mounts
@@ -74,12 +83,16 @@
           if (newTask.value.trim() === '' || newPriority.value === '') {
             return; // Prevent adding empty tasks or without priority
           }
-          tasks.value.unshift({  //add to the beginning of the array (makes more sense)
-            id: tasks.value.length + 1,
+          const newEntry = {
+            id: allTasks.value.length + 1, // Simple ID generation
             description: newTask.value,
             priority: newPriority.value,
             done: false
-          });
+          };
+
+          allTasks.value.unshift(newEntry); // Add new task to the beginning of the list
+          tasks.value.unshift(newEntry); // Update the displayed tasks
+
           newTask.value = ''; // Clear the input after adding
           newPriority.value = ''; // Clear the priority selection
           newTaskInput.value.focus(); // Refocus the input after adding a task
@@ -90,7 +103,8 @@
             tasks,
             addTask,
             newPriority,
-            newTask
+            newTask,
+            newfilter
         }
       },
     };
