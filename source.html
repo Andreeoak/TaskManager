@@ -34,7 +34,7 @@
 
     <div V-else>
       <h3>Your Tasks</h3>
-      <div v-for="task in tasks" :key="task.id" 
+      <div v-for="(task, index) in filteredTasks" :key="task.id" 
       :class="{'task': true,'completed': task.done, [task.priority.toLowerCase()]: true}">
         <div>
           <!-- Is task done? -->
@@ -42,72 +42,69 @@
           <span class="task-description">{{ task.description }}</span>
           <span></span>
         </div>
-        <!-- Removing a task -->
-        <button class="remove-button">✖</button>
+        <button class="remove-button" @click="removeTask(task.id)">✖</button>
       </div>
     </div>
   </div>
 
   <script>
-    const {createApp,ref, onMounted, watch} = Vue;
+    const {createApp, ref, onMounted, watch, computed} = Vue;
 
     const App = {
       setup() {
-        const allTasks = ref(JSON.parse(localStorage.getItem('tasks') ?? '[]'));
-        const tasks = ref([...allTasks.value]); // cópia inicial
-
-        const newTaskInput = Vue.ref(null); //has to be null
+        const tasks = ref(JSON.parse(localStorage.getItem('tasks') ?? '[]'));
+        const newTaskInput = ref(null);
         const newTask = ref('');
         const newPriority = ref('');
         const newfilter = ref('');
 
-        watch(tasks, () => {
-          localStorage.setItem('tasks', JSON.stringify(tasks.value));
-        }, { deep: true });
-
-        watch(newfilter,()=>{
-          if (newfilter.value.trim() === '') {
-            tasks.value = [...allTasks.value];
-          } else {
-            tasks.value = allTasks.value.filter(task =>
+        const filteredTasks = computed(() => {
+          return tasks.value.filter(task =>
             task.description.toLowerCase().includes(newfilter.value.toLowerCase())
-            );
-          }
-        })
-        
-        onMounted(() => {
-          newTaskInput.value.focus(); // Focus the input when the component mounts
+          );
         });
 
         const addTask = () => {
-          if (newTask.value.trim() === '' || newPriority.value === '') {
-            return; // Prevent adding empty tasks or without priority
-          }
+          if (newTask.value.trim() === '' || newPriority.value === '') return;
+
           const newEntry = {
-            id: allTasks.value.length + 1, // Simple ID generation
+            id: tasks.value.length + 1,
             description: newTask.value,
             priority: newPriority.value,
             done: false
           };
 
-          allTasks.value.unshift(newEntry); // Add new task to the beginning of the list
-          tasks.value.unshift(newEntry); // Update the displayed tasks
-
-          newTask.value = ''; // Clear the input after adding
-          newPriority.value = ''; // Clear the priority selection
-          newTaskInput.value.focus(); // Refocus the input after adding a task
+          tasks.value.unshift(newEntry);
+          newTask.value = '';
+          newPriority.value = '';
+          newTaskInput.value.focus();
         };
 
+        const removeTask = (id) => {
+          tasks.value = tasks.value.filter(task => task.id !== id);
+        };
+
+        watch(tasks, () => {
+          localStorage.setItem('tasks', JSON.stringify(tasks.value));
+        }, { deep: true });
+
+        onMounted(() => {
+          newTaskInput.value.focus();
+        });
+
         return {
-            newTaskInput,
-            tasks,
-            addTask,
-            newPriority,
-            newTask,
-            newfilter
-        }
+          newTaskInput,
+          tasks,
+          addTask,
+          newPriority,
+          newTask,
+          newfilter,
+          removeTask,
+          filteredTasks
+        };
       },
     };
+
 
     createApp(App).mount('#app');
   </script>
