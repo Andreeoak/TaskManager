@@ -1,43 +1,100 @@
+/* styles.css */
 
-    body {
-      font-family: 'Arial', sans-serif;
-      padding: 20px;
-      font-size: 16px;
-      background-color: #f4f4f9;
-    }
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #fdf6e3;
+  color: #333;
+  margin: 0;
+  padding: 2rem;
+  line-height: 1.6;
+}
 
-    .task {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: white;
-      padding: 10px 20px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border-left: 5px solid;
-    }
+#app {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #fff8dc;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #e6d8b4;
+}
 
-    .high {
-      border-color: red;
-    }
+input[type="text"], select {
+  width: calc(100% - 1rem);
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  background-color: #fffdf5;
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05);
+}
 
-    .medium {
-      border-color: orange;
-    }
+input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
 
-    .low {
-      border-color: green;
-    }
+button {
+  padding: 0.6rem 1.2rem;
+  background-color: #ffd966;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.3s ease;
+}
 
-    .completed {
-      text-decoration: line-through;
-      color: #bbb;
-    }
+button:hover {
+  background-color: #ffca3a;
+}
 
-    .remove-button {
-      color: red;
-      cursor: pointer;
-      border: none;
-      background: none;
-      font-size: 16px;
-    }
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px dashed #ccc;
+  background-color: #fffef0;
+}
+
+.task-description {
+  flex: 1;
+}
+
+.remove-button {
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: #d9534f;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.remove-button:hover {
+  color: #c9302c;
+}
+
+.completed .task-description {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.no-tasks {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  padding: 1rem;
+}
+
+/* Priority Colors */
+.high {
+  border-left: 6px solid #e63946;
+}
+.medium {
+  border-left: 6px solid #f4a261;
+}
+.low {
+  border-left: 6px solid #2a9d8f;
+}
